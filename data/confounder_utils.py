@@ -37,6 +37,7 @@ def prepare_confounder_data(args, train, return_full_dataset=False):
         confounder_names=args.confounder_names,
         model_type=args.model,
         augment_data=args.augment_data)
+    
     if return_full_dataset:
         return DRODataset(
             full_dataset,

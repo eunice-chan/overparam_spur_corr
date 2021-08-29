@@ -86,7 +86,7 @@ def get_transform_cub(model_type, train, augment_data):
             transforms.Resize((int(target_resolution[0]*scale), int(target_resolution[1]*scale))),
             transforms.CenterCrop(target_resolution),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
     else:
         transform = transforms.Compose([
@@ -97,6 +97,6 @@ def get_transform_cub(model_type, train, augment_data):
                 interpolation=2),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
     return transform
