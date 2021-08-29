@@ -129,8 +129,3 @@ yarl=1.6.3=py39h27cfd23_0
 zipp=3.5.0=pyhd3eb1b0_0
 zlib=1.2.11=h7b6447c_3
 zstd=1.4.9=haebb681_0
-torch @ file:///tmp/build/80754af9/pytorch_1622203140603/work
-torchvision @ file:///tmp/build/80754af9/torchvision_1622226071729/work
-tornado @ file:///tmp/build/80754af9/tornado_1606942317143/work
-tqdm @ file:///tmp/build/80754af9/tqdm_1629302309755/work
-typing-extensions @ file:///tmp/build/80754af9/typing_extensions_1624965014186/work
