@@ -94,6 +94,8 @@ def parse_option():
         opt.n_cls = 10
     elif opt.dataset == 'cifar100':
         opt.n_cls = 100
+    elif opt.dataset == 'waterbirds':
+        opt.n_cls = 2
     else:
         raise ValueError('dataset not supported: {}'.format(opt.dataset))
 
@@ -139,46 +141,50 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
     top1 = AverageMeter()
 
     end = time.time()
-    for idx, (images, labels) in enumerate(train_loader):
-        data_time.update(time.time() - end)
 
-        images = images.cuda(non_blocking=True)
-        labels = labels.cuda(non_blocking=True)
-        bsz = labels.shape[0]
+    if opt.dataset == 'waterbirds':
+        pass
+    else:
+        for idx, (images, labels) in enumerate(train_loader):
+            data_time.update(time.time() - end)
 
-        # warm-up learning rate
-        warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
+            images = images.cuda(non_blocking=True)
+            labels = labels.cuda(non_blocking=True)
+            bsz = labels.shape[0]
 
-        # compute loss
-        with torch.no_grad():
-            features = model.encoder(images)
-        output = classifier(features.detach())
-        loss = criterion(output, labels)
+            # warm-up learning rate
+            warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
 
-        # update metric
-        losses.update(loss.item(), bsz)
-        acc1, acc5 = accuracy(output, labels, topk=(1, 5))
-        top1.update(acc1[0], bsz)
+            # compute loss
+            with torch.no_grad():
+                features = model.encoder(images)
+            output = classifier(features.detach())
+            loss = criterion(output, labels)
 
-        # SGD
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            # update metric
+            losses.update(loss.item(), bsz)
+            acc1, acc5 = accuracy(output, labels, topk=(1, 5))
+            top1.update(acc1[0], bsz)
 
-        # measure elapsed time
-        batch_time.update(time.time() - end)
-        end = time.time()
+            # SGD
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        # print info
-        if (idx + 1) % opt.print_freq == 0:
-            print('Train: [{0}][{1}/{2}]\t'
-                  'BT {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'DT {data_time.val:.3f} ({data_time.avg:.3f})\t'
-                  'loss {loss.val:.3f} ({loss.avg:.3f})\t'
-                  'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
-                   epoch, idx + 1, len(train_loader), batch_time=batch_time,
-                   data_time=data_time, loss=losses, top1=top1))
-            sys.stdout.flush()
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            # print info
+            if (idx + 1) % opt.print_freq == 0:
+                print('Train: [{0}][{1}/{2}]\t'
+                    'BT {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                    'DT {data_time.val:.3f} ({data_time.avg:.3f})\t'
+                    'loss {loss.val:.3f} ({loss.avg:.3f})\t'
+                    'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
+                    epoch, idx + 1, len(train_loader), batch_time=batch_time,
+                    data_time=data_time, loss=losses, top1=top1))
+                sys.stdout.flush()
 
     return losses.avg, top1.avg
 
@@ -192,35 +198,39 @@ def validate(val_loader, model, classifier, criterion, opt):
     losses = AverageMeter()
     top1 = AverageMeter()
 
-    with torch.no_grad():
-        end = time.time()
-        for idx, (images, labels) in enumerate(val_loader):
-            images = images.float().cuda()
-            labels = labels.cuda()
-            bsz = labels.shape[0]
-
-            # forward
-            output = classifier(model.encoder(images))
-            loss = criterion(output, labels)
-
-            # update metric
-            losses.update(loss.item(), bsz)
-            acc1, acc5 = accuracy(output, labels, topk=(1, 5))
-            top1.update(acc1[0], bsz)
-
-            # measure elapsed time
-            batch_time.update(time.time() - end)
+    
+    if opt.dataset == 'waterbirds':
+        pass
+    else:
+        with torch.no_grad():
             end = time.time()
+            for idx, (images, labels) in enumerate(val_loader):
+                images = images.float().cuda()
+                labels = labels.cuda()
+                bsz = labels.shape[0]
 
-            if idx % opt.print_freq == 0:
-                print('Test: [{0}/{1}]\t'
-                      'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                      'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
-                       idx, len(val_loader), batch_time=batch_time,
-                       loss=losses, top1=top1))
+                # forward
+                output = classifier(model.encoder(images))
+                loss = criterion(output, labels)
 
-    print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
+                # update metric
+                losses.update(loss.item(), bsz)
+                acc1, acc5 = accuracy(output, labels, topk=(1, 5))
+                top1.update(acc1[0], bsz)
+
+                # measure elapsed time
+                batch_time.update(time.time() - end)
+                end = time.time()
+
+                if idx % opt.print_freq == 0:
+                    print('Test: [{0}/{1}]\t'
+                        'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                        'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                        'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
+                        idx, len(val_loader), batch_time=batch_time,
+                        loss=losses, top1=top1))
+
+        print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
     return losses.avg, top1.avg
 
 
