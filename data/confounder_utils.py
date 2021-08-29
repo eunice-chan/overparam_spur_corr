@@ -40,7 +40,7 @@ def prepare_confounder_data(args, train, return_full_dataset=False):
     if return_full_dataset:
         return DRODataset(
             full_dataset,
-            process_item_fn=None,
+            process_item_fn=args.transform,
             n_groups=full_dataset.n_groups,
             n_classes=full_dataset.n_classes,
             group_str_fn=full_dataset.group_str)
@@ -55,7 +55,7 @@ def prepare_confounder_data(args, train, return_full_dataset=False):
     dro_subsets = [
         DRODataset(
             subsets[split],
-            process_item_fn=None,
+            process_item_fn=args.transform,
             n_groups=full_dataset.n_groups,
             n_classes=full_dataset.n_classes,
             group_str_fn=full_dataset.group_str) \

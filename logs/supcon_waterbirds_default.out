@@ -1,0 +1,36 @@
+Train: [1][10/19]	BT 248.968 (242.759)	DT 0.001 (0.369)	loss 6.236 (6.246)
+epoch 1, total time 4513.77
+Train: [2][10/19]	BT 208.151 (234.060)	DT 0.001 (0.543)	loss 6.236 (6.236)
+epoch 2, total time 4582.17
+Train: [3][10/19]	BT 40.150 (216.537)	DT 0.002 (0.487)	loss 6.236 (6.236)
+epoch 3, total time 4338.55
+Train: [4][10/19]	BT 199.006 (252.769)	DT 0.001 (0.538)	loss 6.236 (6.236)
+epoch 4, total time 4436.42
+Train: [5][10/19]	BT 44.043 (38.309)	DT 0.001 (0.323)	loss 6.235 (6.236)
+epoch 5, total time 697.95
+Train: [6][10/19]	BT 34.625 (37.177)	DT 0.001 (0.313)	loss 6.234 (6.235)
+epoch 6, total time 693.06
+Train: [7][10/19]	BT 34.685 (36.058)	DT 0.001 (0.311)	loss 6.230 (6.232)
+epoch 7, total time 677.47
+Train: [8][10/19]	BT 35.162 (37.431)	DT 0.001 (0.308)	loss 6.237 (6.230)
+epoch 8, total time 690.57
+Train: [9][10/19]	BT 36.316 (37.793)	DT 0.001 (0.337)	loss 6.221 (6.229)
+epoch 9, total time 697.31
+Train: [10][10/19]	BT 35.581 (36.495)	DT 0.001 (0.316)	loss 6.236 (6.227)
+epoch 10, total time 679.50
+Train: [11][10/19]	BT 35.622 (37.146)	DT 0.001 (0.327)	loss 6.226 (6.224)
+epoch 11, total time 685.00
+Train: [12][10/19]	BT 50.055 (37.881)	DT 0.001 (0.306)	loss 6.210 (6.216)
+epoch 12, total time 699.24
+Train: [13][10/19]	BT 35.045 (36.378)	DT 0.001 (0.330)	loss 6.222 (6.213)
+epoch 13, total time 682.93
+Train: [14][10/19]	BT 34.970 (37.309)	DT 0.002 (0.325)	loss 6.209 (6.209)
+epoch 14, total time 690.22
+Train: [15][10/19]	BT 38.093 (36.631)	DT 0.001 (0.315)	loss 6.201 (6.201)
+epoch 15, total time 696.17
+Train: [16][10/19]	BT 35.487 (36.735)	DT 0.001 (0.310)	loss 6.227 (6.193)
+epoch 16, total time 681.23
+Train: [17][10/19]	BT 36.178 (37.294)	DT 0.004 (0.323)	loss 6.198 (6.195)
+epoch 17, total time 691.01
+Train: [18][10/19]	BT 35.779 (36.986)	DT 0.001 (0.319)	loss 6.175 (6.187)
+epoch 18, total time 681.72
