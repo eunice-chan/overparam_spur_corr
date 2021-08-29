@@ -161,7 +161,7 @@ def set_loader(opt):
                 self.subsample_to_minority = False
                 self.reweight_groups = False
                 self.fraction = 1.0
-                self.transform = lambda pt: (TwoCropTransform(train_transform)(pt[0),pt[1],pt[2])
+                self.transform = lambda pt: (TwoCropTransform(train_transform)(pt[0]),pt[1],pt[2])
         args = WaterbirdArgs()
 
         train_data, val_data, test_data = prepare_data(args, train=True)
