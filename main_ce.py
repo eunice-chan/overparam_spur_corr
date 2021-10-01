@@ -55,7 +55,7 @@ def parse_option():
     parser.add_argument('--model', type=str, default='resnet50')
     parser.add_argument('--dataset', type=str, default='cifar10',
                         choices=['cifar10', 'cifar100'], help='dataset')
-    parser.add_argument('--size', type=int, default=32, help='image size')
+    parser.add_argument('--size', type=int, default=32, help='parameter for RandomResizedCrop')
 
     # other setting
     parser.add_argument('--cosine', action='store_true',
@@ -148,7 +148,7 @@ def set_loader(opt):
                 self.subsample_to_minority = False
                 self.reweight_groups = False
                 self.fraction = 1.0
-                self.transform = lambda pt: (TwoCropTransform(train_transform)((pt[0] - pt[0].min().item())/(pt[0].max().item() - pt[0].min().item())),pt[1],pt[2])
+                self.transform = lambda pt: (train_transform(pt[0]),pt[1],pt[2])
         args = WaterbirdArgs()
 
         train_data, val_data, test_data = prepare_data(args, train=True)
@@ -187,15 +187,15 @@ def set_loader(opt):
                                             transform=train_transform,
                                             download=True)
             val_dataset = datasets.CIFAR10(root=opt.data_folder,
-                                        train=False,
-                                        transform=val_transform)
+                                            transform=val_transform
+                                            train=False)
         elif opt.dataset == 'cifar100':
-            train_dataset = datasets.CIFAR100(root=opt.data_folder,
+            train_dataset = datasets.CIFAR10(root=opt.data_folder,
                                             transform=train_transform,
                                             download=True)
-            val_dataset = datasets.CIFAR100(root=opt.data_folder,
-                                            train=False,
-                                            transform=val_transform)
+            val_dataset = datasets.CIFAR10(root=opt.data_folder,
+                                            transform=val_transform
+                                            train=False)
         else:
             raise ValueError(opt.dataset)
 
