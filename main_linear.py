@@ -10,7 +10,7 @@ import torch.backends.cudnn as cudnn
 
 from main_ce import set_loader
 from util import AverageMeter
-from util import adjust_learning_rate, warmup_learning_rate, accuracy
+from util import adjust_learning_rate, warmup_learning_rate, accuracy, robust_acc
 from util import set_optimizer
 from networks.resnet_big import SupConResNet, LinearClassifier
 
@@ -50,7 +50,7 @@ def parse_option():
     # model dataset
     parser.add_argument('--model', type=str, default='resnet50')
     parser.add_argument('--dataset', type=str, default='cifar10',
-                        choices=['cifar10', 'cifar100'], help='dataset')
+                        choices=['cifar10', 'cifar100', 'waterbirds'], help='dataset')
 
     # other setting
     parser.add_argument('--cosine', action='store_true',
@@ -65,6 +65,9 @@ def parse_option():
 
     # set the path according to the environment
     opt.data_folder = './datasets/'
+    opt.model_path = './save/SupConLinear/{}_models'.format(opt.dataset)
+    opt.log_path = './save/SupConLinear/{}_logs'.format(opt.dataset)
+    opt.tb_path = './save/SupConLinear/{}_tensorboard'.format(opt.dataset)
 
     iterations = opt.lr_decay_epochs.split(',')
     opt.lr_decay_epochs = list([])
@@ -89,6 +92,18 @@ def parse_option():
                     1 + math.cos(math.pi * opt.warm_epochs / opt.epochs)) / 2
         else:
             opt.warmup_to = opt.learning_rate
+    
+    opt.tb_folder = os.path.join(opt.tb_path, opt.model_name)
+    if not os.path.isdir(opt.tb_folder):
+        os.makedirs(opt.tb_folder)
+
+    opt.save_folder = os.path.join(opt.model_path, opt.model_name)
+    if not os.path.isdir(opt.save_folder):
+        os.makedirs(opt.save_folder)
+
+    opt.log_folder = os.path.join(opt.log_path, opt.model_name)
+    if not os.path.isdir(opt.log_folder):
+        os.makedirs(opt.log_folder)
 
     if opt.dataset == 'cifar10':
         opt.n_cls = 10
@@ -131,7 +146,13 @@ def set_model(opt):
 
 
 def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
-    """one epoch training"""
+    """
+    one epoch training
+    return:
+    avg loss (float)
+    top1 accuracy (AverageMeter)
+    group accuracy (array of each group -- 4 in the case of waterbirds, none in the case of cifar)
+    """
     model.eval()
     classifier.train()
 
@@ -143,8 +164,53 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
     end = time.time()
 
     if opt.dataset == 'waterbirds':
-        pass
+        group = [AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()]
+        for idx, (images, labels, group) in enumerate(train_loader):
+            data_time.update(time.time() - end)
+
+            images = images.cuda(non_blocking=True)
+            labels = labels.cuda(non_blocking=True)
+            bsz = labels.shape[0]
+
+            # warm-up learning rate
+            warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
+
+            # compute loss
+            with torch.no_grad():
+                features = model.encoder(images)
+            output = classifier(features.detach())
+            loss = criterion(output, labels)
+
+            # update metric
+            losses.update(loss.item(), bsz)
+            acc1, acc5 = accuracy(output, labels, topk=(1, 5))
+            acc = robust_acc(output, group)
+            for i in range(4):
+                group[i].update(acc[i], bsz)
+            top1.update(acc1[0], bsz)
+
+            # SGD
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            # print info
+            if (idx + 1) % opt.print_freq == 0:
+                print('Train: [{0}][{1}/{2}]\t'
+                    'BT {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
+                    'DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'
+                    'loss {loss.val:.3f} ({loss.avg:.3f})\t'
+                    'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
+                    'Group Acc@1 {acc[0]:.3f} {acc[1]:.3f} {acc[2]:.3f} {acc[3]:.3f}'.format(
+                    epoch, idx + 1, len(train_loader), batch_time=batch_time,
+                    data_time=data_time, loss=losses, top1=top1, acc=acc))
+                sys.stdout.flush()
     else:
+        group = []
         for idx, (images, labels) in enumerate(train_loader):
             data_time.update(time.time() - end)
 
@@ -178,30 +244,75 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
             # print info
             if (idx + 1) % opt.print_freq == 0:
                 print('Train: [{0}][{1}/{2}]\t'
-                    'BT {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                    'DT {data_time.val:.3f} ({data_time.avg:.3f})\t'
+                    'BT {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
+                    'DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'
                     'loss {loss.val:.3f} ({loss.avg:.3f})\t'
                     'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
                     epoch, idx + 1, len(train_loader), batch_time=batch_time,
                     data_time=data_time, loss=losses, top1=top1))
                 sys.stdout.flush()
 
-    return losses.avg, top1.avg
+    return losses.avg, top1, group
 
 
 def validate(val_loader, model, classifier, criterion, opt):
-    """validation"""
+    """
+    validation
+    return:
+    avg loss (list of floats [val, test(opt)])
+    top1 accuracy (list of AverageMeter [val, test(opt)])
+    group accuracy (list of array of each group [val, test(opt)])
+    """
     model.eval()
     classifier.eval()
 
-    batch_time = AverageMeter()
-    losses = AverageMeter()
-    top1 = AverageMeter()
+    losses = [AverageMeter()]
+    top1 = [AverageMeter()]
 
     
     if opt.dataset == 'waterbirds':
-        pass
+        losses.append(AverageMeter())
+        top1.append(AverageMeter())
+        group = [[AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()], 
+                 [AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()]]
+        with torch.no_grad():
+            end = time.time()
+            for dtype, validate_loader in enumerate(val_loader):
+                batch_time = AverageMeter()
+                for idx, (images, labels) in enumerate(validate_loader):
+                    images = images.float().cuda()
+                    labels = labels.cuda()
+                    bsz = labels.shape[0]
+
+                    # forward
+                    output = classifier(model.encoder(images))
+                    loss = criterion(output, labels)
+
+                    # update metric
+                    losses[dtype].update(loss.item(), bsz)
+                    acc1, acc5 = accuracy(output, labels, topk=(1, 5))
+                    acc = robust_acc(output, group)
+                    for i in range(4):
+                        group[dtype][i].update(acc[i], bsz)
+                    top1[dtype].update(acc1[0], bsz)
+
+                    # measure elapsed time
+                    batch_time.update(time.time() - end)
+                    end = time.time()
+
+                    if idx % opt.print_freq == 0:
+                        print('Test: [{0}/{1}]\t'
+                            'Time {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
+                            'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                            'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
+                            'Group Acc@1 {acc[0]:.3f} {acc[1]:.3f} {acc[2]:.3f} {acc[3]:.3f}'.format(
+                            idx, len(validate_loader), batch_time=batch_time,
+                            loss=losses, top1=top1, acc=acc))
+ 
+                    print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
     else:
+        batch_time = AverageMeter()
+        group = [[]]
         with torch.no_grad():
             end = time.time()
             for idx, (images, labels) in enumerate(val_loader):
@@ -214,9 +325,9 @@ def validate(val_loader, model, classifier, criterion, opt):
                 loss = criterion(output, labels)
 
                 # update metric
-                losses.update(loss.item(), bsz)
+                losses[0].update(loss.item(), bsz)
                 acc1, acc5 = accuracy(output, labels, topk=(1, 5))
-                top1.update(acc1[0], bsz)
+                top1[0].update(acc1[0], bsz)
 
                 # measure elapsed time
                 batch_time.update(time.time() - end)
@@ -224,14 +335,14 @@ def validate(val_loader, model, classifier, criterion, opt):
 
                 if idx % opt.print_freq == 0:
                     print('Test: [{0}/{1}]\t'
-                        'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                        'Time {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                         'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                         'Acc@1 {top1.val:.3f} ({top1.avg:.3f})'.format(
                         idx, len(val_loader), batch_time=batch_time,
                         loss=losses, top1=top1))
 
         print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
-    return losses.avg, top1.avg
+    return [loss.avg for loss in losses], top1, group
 
 
 def main():
@@ -246,6 +357,20 @@ def main():
 
     # build optimizer
     optimizer = set_optimizer(opt, classifier)
+    
+    # logs
+    log_file = open(opt.log_path+"/log.txt", "a")
+    header = "epoch,avg_train_acc,avg_train_count,avg_val_acc,avg_val_count"
+    if opt.dataset == "waterbirds":
+        header += ",avg_test_acc,avg_test_count"
+        for group in range(4):
+            for dtype in ["train", "val", "test"]:
+                header += ",avg_{dtype}_acc:group_{group},avg_{dtype}count:group_{group}".\
+                            format(dtype=dtype, group=group)
+    log_file.write(header+"\n")
+   
+    # tensorboard
+    logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
 
     # training routine
     for epoch in range(1, opt.epochs + 1):
@@ -253,16 +378,41 @@ def main():
 
         # train for one epoch
         time1 = time.time()
-        loss, acc = train(train_loader, model, classifier, criterion,
+        loss, acc, group = train(train_loader, model, classifier, criterion,
                           optimizer, epoch, opt)
         time2 = time.time()
         print('Train epoch {}, total time {:.2f}, accuracy:{:.2f}'.format(
             epoch, time2 - time1, acc))
 
         # eval for one epoch
-        loss, val_acc = validate(val_loader, model, classifier, criterion, opt)
+        loss, val_acc, val_group = validate(val_loader, model, classifier, criterion, opt)
+
+        # save train, val loss, acc, group(s) to csv
+        row = "{epoch},{avg_train_acc},{avg_train_count}".\
+                format(epoch=epoch, avg_train_acc=acc.avg, avg_train_count=acc.count)
+        for acc in val_acc:
+            row += ',{},{}'.format(acc.avg, acc.count)
+        for i in range(len(group)):
+                         # train, val, test
+            for dtype in [group, val_group[0], val_group[1]]:
+                row += ',{},{}'.format(dtype[i].avg, dtype[i].count)
+        
+        log_file.write(row+"\n")
+   
         if val_acc > best_acc:
             best_acc = val_acc
+
+        if epoch % opt.save_freq == 0:
+            save_file = os.path.join(
+                opt.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
+            save_model(model, optimizer, opt, epoch, save_file)
+
+    # save the last model
+    save_file = os.path.join(
+        opt.save_folder, 'last.pth')
+    save_model(model, optimizer, opt, opt.epochs, save_file)
+
+    log_file.close()
 
     print('best accuracy: {:.2f}'.format(best_acc))
 

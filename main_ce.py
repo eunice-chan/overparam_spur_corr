@@ -117,7 +117,8 @@ def parse_option():
     return opt
 
 
-def set_loader(opt):if opt.dataset == 'waterbirds':
+def set_loader(opt):
+    if opt.dataset == 'waterbirds':
 
         class WaterbirdArgs:
             def __init__(self):
