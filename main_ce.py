@@ -187,14 +187,14 @@ def set_loader(opt):
                                             transform=train_transform,
                                             download=True)
             val_dataset = datasets.CIFAR10(root=opt.data_folder,
-                                            transform=val_transform
+                                            transform=val_transform,
                                             train=False)
         elif opt.dataset == 'cifar100':
             train_dataset = datasets.CIFAR10(root=opt.data_folder,
                                             transform=train_transform,
                                             download=True)
             val_dataset = datasets.CIFAR10(root=opt.data_folder,
-                                            transform=val_transform
+                                            transform=val_transform,
                                             train=False)
         else:
             raise ValueError(opt.dataset)

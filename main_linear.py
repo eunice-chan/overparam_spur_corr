@@ -358,7 +358,7 @@ def main():
     model, classifier, criterion = set_model(opt)
 
     # build optimizer
-    optimizer = set_optimizer(opt, classifier)
+    optimizer = set_optimizer(opt, classifier) #SGD
     
     # logs
     log_file = open(opt.log_path+"/log.txt", "a")
