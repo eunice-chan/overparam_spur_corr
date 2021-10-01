@@ -49,6 +49,19 @@ def accuracy(output, target, topk=(1,)):
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
 
+def robust_acc(output, group):
+    with torch.no_grad():
+        batch_size = target.size(0)
+        _, pred = output.topk(1, 1, True, True)
+        pred = pred.t()
+        res = []
+        for group in range(4):
+            target_group = target.eq(group).astype(int)
+            correct = pred.eq(target.view(1, -1).expand_as(pred))
+            correct = correct[:1].view(-1).float().sum(0, keepdim=True)
+            res.append(correct.mul_(100.0 / batch_size))
+        print(output, pred, target, labels, group, res, target_group)
+        return res
 
 def adjust_learning_rate(args, optimizer, epoch):
     lr = args.learning_rate
