@@ -69,7 +69,6 @@ def parse_option():
     opt.data_folder = './datasets/'
     opt.model_path = './save/SupConLinear/{}_models'.format(opt.dataset)
     opt.log_path = './save/SupConLinear/{}_logs'.format(opt.dataset)
-    opt.tb_path = './save/SupConLinear/{}_tensorboard'.format(opt.dataset)
 
     iterations = opt.lr_decay_epochs.split(',')
     opt.lr_decay_epochs = list([])
@@ -94,10 +93,6 @@ def parse_option():
                     1 + math.cos(math.pi * opt.warm_epochs / opt.epochs)) / 2
         else:
             opt.warmup_to = opt.learning_rate
-    
-    opt.tb_folder = os.path.join(opt.tb_path, opt.model_name)
-    if not os.path.isdir(opt.tb_folder):
-        os.makedirs(opt.tb_folder)
 
     opt.save_folder = os.path.join(opt.model_path, opt.model_name)
     if not os.path.isdir(opt.save_folder):
@@ -370,9 +365,6 @@ def main():
                 header += ",avg_{dtype}_acc:group_{group},avg_{dtype}count:group_{group}".\
                             format(dtype=dtype, group=group)
     log_file.write(header+"\n")
-   
-    # tensorboard
-    logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
 
     # training routine
     for epoch in range(1, opt.epochs + 1):
