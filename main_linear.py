@@ -356,7 +356,7 @@ def main():
     optimizer = set_optimizer(opt, classifier) #SGD
     
     # logs
-    log_file = open(opt.log_path+"/log.txt", "a")
+    log_file = open(opt.log_folder+"/log.txt", "a")
     header = "epoch,avg_train_acc,avg_train_count,avg_val_acc,avg_val_count"
     if opt.dataset == "waterbirds":
         header += ",avg_test_acc,avg_test_count"
