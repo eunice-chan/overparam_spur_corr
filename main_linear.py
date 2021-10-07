@@ -180,7 +180,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
 
             # update metric
             losses.update(loss.item(), bsz)
-            acc1, acc5 = accuracy(output, labels, topk=(1, 5))
+            acc1 = accuracy(output, labels, topk=(1, 1))
             acc = robust_acc(output, group)
             for i in range(4):
                 group[i].update(acc[i], bsz)
