@@ -51,6 +51,7 @@ def accuracy(output, target, topk=(1,)):
 
 def robust_acc(output, target):
     with torch.no_grad():
+        target = target.cpu().data.numpy()
         batch_size = target.size(0)
         _, pred = output.topk(1, 1, True, True)
         pred = pred.t()
