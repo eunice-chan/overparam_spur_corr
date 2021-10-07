@@ -49,7 +49,7 @@ def accuracy(output, target, topk=(1,)):
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
 
-def robust_acc(output, group):
+def robust_acc(output, target):
     with torch.no_grad():
         batch_size = target.size(0)
         _, pred = output.topk(1, 1, True, True)
