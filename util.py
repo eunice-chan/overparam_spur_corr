@@ -51,15 +51,23 @@ def accuracy(output, target, topk=(1,)):
 
 def robust_acc(output, target):
     with torch.no_grad():
-        target = target.cpu().data.numpy()
         batch_size = target.size(0)
         _, pred = output.topk(1, 1, True, True)
         pred = pred.t()
         res = []
         for group in range(4):
-            target_group = target.eq(group).astype(int)
-            correct = pred.eq(target.view(1, -1).expand_as(pred))
+            target_group = target.eq(group)
+            print("Target group", group)
+            print(target_group)
+            print(target_group.view(1, -1).expand_as(pred))
+            print("Pred")
+            print(pred)
+            print("Correct")
+            correct = pred.eq(target_group.view(1, -1).expand_as(pred))
+            print(cprrect)
             correct = correct[:1].view(-1).float().sum(0, keepdim=True)
+            print(correct)
+            print(correct.mul_(100.0 / batch_size))
             res.append(correct.mul_(100.0 / batch_size))
         print(output, pred, target, labels, group, res, target_group)
         return res
