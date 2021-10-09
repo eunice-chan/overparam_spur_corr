@@ -161,7 +161,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
     end = time.time()
 
     if opt.dataset == 'waterbirds':
-        group = [AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()]
+        groups = [AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()]
         for idx, (images, labels, group) in enumerate(train_loader):
             data_time.update(time.time() - end)
 
@@ -183,7 +183,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
             acc1 = accuracy(output, labels, topk=(1, 1))
             acc = robust_acc(output, group)
             for i in range(4):
-                group[i].update(acc[i], bsz)
+                groups[i].update(acc[i], bsz)
             top1.update(acc1[0], bsz)
 
             # SGD
