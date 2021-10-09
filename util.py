@@ -83,7 +83,7 @@ def robust_acc(output, target):
             print(correct)
             print(correct.mul_(100.0 / batch_size))
             res.append(correct.mul_(100.0 / batch_size))
-        print(output, pred, target, labels, group, res, target_group)
+        print(output, pred, target, group, res, target_group)
         return res
 
 def adjust_learning_rate(args, optimizer, epoch):
