@@ -197,14 +197,22 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
 
             # print info
             if (idx + 1) % opt.print_freq == 0:
+                print('Train: [{0}][{1}/{2}]\t'.format(
+                    epoch, idx + 1, len(train_loader)))
+                print('BT {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'.format(batch_time=batch_time))
+                print('DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'.format(data_time=data_time))
+                print('loss {loss.val:.3f} ({loss.avg:.3f})\t'.format(loss=losses))
+                print('Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'.format(top1=top1))
+                print('Group Acc@1 {acc0:.3f} {acc1:.3f} {acc2:.3f} {acc3:.3f}'.format(acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
                 print('Train: [{0}][{1}/{2}]\t'
                     'BT {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                     'DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'
                     'loss {loss.val:.3f} ({loss.avg:.3f})\t'
                     'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                    'Group Acc@1 {acc[0]:.3f} {acc[1]:.3f} {acc[2]:.3f} {acc[3]:.3f}'.format(
+                    'Group Acc@1 {acc0:.3f} {acc1:.3f} {acc2:.3f} {acc3:.3f}'.format(
                     epoch, idx + 1, len(train_loader), batch_time=batch_time,
-                    data_time=data_time, loss=losses, top1=top1, acc=acc))
+                    data_time=data_time, loss=losses, top1=top1, 
+                    acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
                 sys.stdout.flush()
     else:
         group = []
@@ -302,9 +310,10 @@ def validate(val_loader, model, classifier, criterion, opt):
                             'Time {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                             'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                             'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                            'Group Acc@1 {acc[0]:.3f} {acc[1]:.3f} {acc[2]:.3f} {acc[3]:.3f}'.format(
+                            'Group Acc@1 {acc0:.3f} {acc1:.3f} {acc2:.3f} {acc3:.3f}'.format(
                             idx, len(validate_loader), batch_time=batch_time,
-                            loss=losses, top1=top1, acc=acc))
+                            loss=losses, top1=top1,
+                            acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
  
                     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
     else:
