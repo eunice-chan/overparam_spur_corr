@@ -38,52 +38,52 @@ def accuracy(output, target, topk=(1,)):
     with torch.no_grad():
         maxk = max(topk)
         batch_size = target.size(0)
-        print("Target", type(target))
-        print(target)
-        print("Batch size", batch_size)
+        # print("Target", type(target))
+        # print(target)
+        # print("Batch size", batch_size)
 
         _, pred = output.topk(maxk, 1, True, True)
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))
-        print("Pred")
-        print(pred)
-        print("Correct")
-        print(correct)
+        # print("Pred")
+        # print(pred)
+        # print("Correct")
+        # print(correct)
 
         res = []
         for k in topk:
             correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
-            print(correct_k)
-            print(correct_k.mul_(100.0 / batch_size))
+            # print(correct_k)
+            # print(correct_k.mul_(100.0 / batch_size))
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
 
 def robust_acc(output, target):
     with torch.no_grad():
-        print("Target", type(target))
-        print(target)
+        # print("Target", type(target))
+        # print(target)
         target = target.to(torch.device("cuda"))
-        print(target)
+        # print(target)
         batch_size = target.size(0)
-        print("Batch size", batch_size)
+        # print("Batch size", batch_size)
         _, pred = output.topk(1, 1, True, True)
         pred = pred.t()
         res = []
         for group in range(4):
             target_group = target.eq(group)
-            print("Target group", group, type(target_group))
-            print(target_group)
-            print(target_group.view(1, -1).expand_as(pred))
-            print("Pred")
-            print(pred)
-            print("Correct")
+            # print("Target group", group, type(target_group))
+            # print(target_group)
+            # print(target_group.view(1, -1).expand_as(pred))
+            # print("Pred")
+            # print(pred)
+            # print("Correct")
             correct = pred.eq(target_group.view(1, -1).expand_as(pred))
-            print(correct)
+            # print(correct)
             correct = correct[:1].view(-1).float().sum(0, keepdim=True)
-            print(correct)
-            print(correct.mul_(100.0 / batch_size))
+            # print(correct)
+            # print(correct.mul_(100.0 / batch_size))
             res.append(correct.mul_(100.0 / batch_size))
-        print(output, pred, target, group, res, target_group)
+        # print(output, pred, target, group, res, target_group)
         return res
 
 def adjust_learning_rate(args, optimizer, epoch):
