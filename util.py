@@ -60,6 +60,10 @@ def accuracy(output, target, topk=(1,)):
 
 def robust_acc(output, target):
     with torch.no_grad():
+        print("Target", type(target))
+        print(target)
+        target = target.to(torch.device("cuda"))
+        print(target)
         batch_size = target.size(0)
         print("Batch size", batch_size)
         _, pred = output.topk(1, 1, True, True)
