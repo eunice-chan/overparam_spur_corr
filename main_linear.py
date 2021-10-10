@@ -181,7 +181,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
             # update metric
             losses.update(loss.item(), bsz)
             acc1 = accuracy(output, labels, topk=(1, 1))
-            acc = robust_acc(output, target, group)
+            acc = robust_acc(output, labels, group)
             for i in range(4):
                 groups[i].update(acc[i].item(), bsz)
             top1.update(acc1[0].item(), bsz)
@@ -289,7 +289,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                     # update metric
                     losses[dtype].update(loss.item(), bsz)
                     acc1 = accuracy(output, labels)
-                    acc = robust_acc(output, target, group)
+                    acc = robust_acc(output, labels, group)
                     for i in range(4):
                         groups[dtype][i].update(acc[i].item(), bsz)
                     top1[dtype].update(acc1[0].item(), bsz)
