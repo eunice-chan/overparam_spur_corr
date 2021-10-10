@@ -206,7 +206,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
                 print(top1.val)
                 print(top1.avg)
                 print('Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'.format(top1=top1))
-                print('Group Acc@1 {acc0:.3f} {acc1:.3f} {acc2:.3f} {acc3:.3f}'.format(acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
+                print('Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
                 print('Train: [{0}][{1}/{2}]\t'
                     'BT {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                     'DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'
