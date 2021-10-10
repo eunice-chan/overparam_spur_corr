@@ -56,7 +56,7 @@ def robust_acc(output, target, group):
         batch_size = target.size(0)
         _, pred = output.topk(1, 1, True, True)
         pred = pred.t()
-        correct = pred.eq(target.view(1, -1).expand_as(pred))[:1]
+        correct = pred.eq(target.view(1, -1).expand_as(pred))[:1].view(-1)
         
         print("Batch size", batch_size)
         print("Group | Target | Pred | Correct")
@@ -67,11 +67,11 @@ def robust_acc(output, target, group):
         for i in range(4):
             this_group = group.eq(i)
             group_count = this_group.sum(0, keepdim=True).item()
-            print("Group size", group_count)
+            print(i, "group size", group_count)
             print("This Group? | Group | Target | Pred | Correct")
             for tg, groupi, targeti, predi, correcti in zip(this_group, group, target, pred, correct):
                 print(tg, "|", groupi, "|", targeti, "|", predi, "|", correcti)
-            group_acc = correct.view(-1)[this_group]
+            group_acc = correct[this_group]
             print(group_acc)
             print("ACC", group_acc.float().sum(0, keepdim=True).mul_(100.0 / batch_size))
             res.append(group_acc.float().sum(0, keepdim=True).mul_(100.0 / batch_size))
