@@ -58,24 +58,24 @@ def robust_acc(output, target, group):
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))[:1].view(-1)
 
-        pred=pred.cpu().numpy()[0]
-        print("Batch size", batch_size)
-        print("Group | Target | Pred | Correct")
-        for groupi, targeti, predi, correcti in zip(group, target, pred, correct):
-            print(groupi.item(), "|", targeti.item(), "|", predi, "|", correcti.item())
+        # pred=pred.cpu().numpy()[0]
+        # print("Batch size", batch_size)
+        # print("Group | Target | Pred | Correct")
+        # for groupi, targeti, predi, correcti in zip(group, target, pred, correct):
+        #     print(groupi.item(), "|", targeti.item(), "|", predi, "|", correcti.item())
 
         res = []
         for i in range(4):
             this_group = group.eq(i)
             group_count = this_group.sum(0, keepdim=True).item()
-            print(i, "group size", group_count)
-            print("This Group? | Group | Target | Pred | Correct")
-            for tg, groupi, targeti, predi, correcti in zip(this_group, group, target, pred, correct):
-                print(tg.item(), "|", groupi.item(), "|", targeti.item(), "|", predi, "|", correcti.item())
-            group_acc = correct[this_group]
-            print(group_acc)
-            print("ACC", group_acc.float().sum(0, keepdim=True).mul_(100.0 / batch_size))
-            res.append(group_acc.float().sum(0, keepdim=True).mul_(100.0 / batch_size))
+            # print(i, "group size", group_count)
+            # print("This Group? | Group | Target | Pred | Correct")
+            # for tg, groupi, targeti, predi, correcti in zip(this_group, group, target, pred, correct):
+            #     print(tg.item(), "|", groupi.item(), "|", targeti.item(), "|", predi, "|", correcti.item())
+            # group_acc = correct[this_group]
+            # print(group_acc)
+            # print("ACC", group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count))
+            res.append([group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count), group_count])
         return res
 
 def adjust_learning_rate(args, optimizer, epoch):

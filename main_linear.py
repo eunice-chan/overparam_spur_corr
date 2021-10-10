@@ -182,9 +182,8 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
             losses.update(loss.item(), bsz)
             acc1 = accuracy(output, labels, topk=(1, 1))
             acc = robust_acc(output, labels, group)
-            exit(0)
             for i in range(4):
-                groups[i].update(acc[i].item(), bsz)
+                groups[i].update(acc[i][0].item(), acc[i][1])
             top1.update(acc1[0].item(), bsz)
 
             # SGD
@@ -292,7 +291,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                     acc1 = accuracy(output, labels)
                     acc = robust_acc(output, labels, group)
                     for i in range(4):
-                        groups[dtype][i].update(acc[i].item(), bsz)
+                        groups[dtype][i].update(acc[i][0].item(), acc[i][1])
                     top1[dtype].update(acc1[0].item(), bsz)
 
                     # measure elapsed time
