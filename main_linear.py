@@ -182,6 +182,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
             losses.update(loss.item(), bsz)
             acc1 = accuracy(output, labels, topk=(1, 1))
             acc = robust_acc(output, labels, group)
+            exit(0)
             for i in range(4):
                 groups[i].update(acc[i].item(), bsz)
             top1.update(acc1[0].item(), bsz)
