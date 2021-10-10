@@ -208,7 +208,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
                     acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
                 sys.stdout.flush()
     else:
-        group = []
+        groups = []
         for idx, (images, labels) in enumerate(train_loader):
             data_time.update(time.time() - end)
 
@@ -250,7 +250,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
                     data_time=data_time, loss=losses, top1=top1))
                 sys.stdout.flush()
 
-    return losses.avg, top1, group
+    return losses.avg, top1, groups
 
 
 def validate(val_loader, model, classifier, criterion, opt):
@@ -271,7 +271,7 @@ def validate(val_loader, model, classifier, criterion, opt):
     if opt.dataset == 'waterbirds':
         losses.append(AverageMeter())
         top1.append(AverageMeter())
-        group = [[AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()], 
+        groups = [[AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()], 
                  [AverageMeter(), AverageMeter(), AverageMeter(), AverageMeter()]]
         with torch.no_grad():
             end = time.time()
@@ -312,7 +312,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
     else:
         batch_time = AverageMeter()
-        group = [[]]
+        groups = [[]]
         with torch.no_grad():
             end = time.time()
             for idx, (images, labels) in enumerate(val_loader):
@@ -342,7 +342,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                         loss=losses, top1=top1))
 
         print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
-    return [loss.avg for loss in losses], top1, group
+    return [loss.avg for loss in losses], top1, groups
 
 
 def main():
