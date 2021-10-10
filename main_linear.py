@@ -183,8 +183,8 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
             acc1 = accuracy(output, labels, topk=(1, 1))
             acc = robust_acc(output, group)
             for i in range(4):
-                groups[i].update(acc[i], bsz)
-            top1.update(acc1[0], bsz)
+                groups[i].update(acc[i].item(), bsz)
+            top1.update(acc1[0].item(), bsz)
 
             # SGD
             optimizer.zero_grad()
@@ -302,8 +302,8 @@ def validate(val_loader, model, classifier, criterion, opt):
                     acc1, acc5 = accuracy(output, labels, topk=(1, 5))
                     acc = robust_acc(output, group)
                     for i in range(4):
-                        group[dtype][i].update(acc[i], bsz)
-                    top1[dtype].update(acc1[0], bsz)
+                        group[dtype][i].update(acc[i].item(), bsz)
+                    top1[dtype].update(acc1[0].item(), bsz)
 
                     # measure elapsed time
                     batch_time.update(time.time() - end)
