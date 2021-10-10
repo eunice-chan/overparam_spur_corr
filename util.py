@@ -53,25 +53,28 @@ def robust_acc(output, target, group):
     with torch.no_grad():
         target = target.to(torch.device("cuda"))
         group = group.to(torch.device("cuda"))
-        print("Target", target)
-        print("Group", group)
         batch_size = target.size(0)
-        print("Batch size", batch_size)
         _, pred = output.topk(1, 1, True, True)
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))[:1]
-        print("Pred")
-        print(pred)
-        print("Correct")
-        print(correct)
+        
+        print("Batch size", batch_size)
+        print("Group | Target | Pred | Correct")
+        for groupi, targeti, predi, correcti in zip(group, target, pred, correct):
+            print(groupi, "|", targeti, "|", predi, "|", correcti)
+
         res = []
         for i in range(4):
             this_group = group.eq(i)
-            group_count = sum(this_group)
-            print("This group", this_group, "count", group_count)
-            group_acc = correct[this_group]
-            print("ACC", group_acc.view(-1).float().sum(0, keepdim=True).mul_(100.0 / batch_size))
-            res.append(group_acc.view(-1).float().sum(0, keepdim=True).mul_(100.0 / batch_size))
+            group_count = this_group.sum(0, keepdim=True).item()
+            print("Group size", group_count)
+            print("This Group? | Group | Target | Pred | Correct")
+            for tg, groupi, targeti, predi, correcti in zip(this_group, group, target, pred, correct):
+                print(tg, "|", groupi, "|", targeti, "|", predi, "|", correcti)
+            group_acc = correct.view(-1)[this_group]
+            print(group_acc)
+            print("ACC", group_acc.float().sum(0, keepdim=True).mul_(100.0 / batch_size))
+            res.append(group_acc.float().sum(0, keepdim=True).mul_(100.0 / batch_size))
         return res
 
 def adjust_learning_rate(args, optimizer, epoch):
