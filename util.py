@@ -58,8 +58,7 @@ def robust_acc(output, target, group):
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))[:1].view(-1)
 
-        pred=pred.cpu().numpy()
-        print(pred)
+        pred=pred.cpu().numpy()[0]
         print("Batch size", batch_size)
         print("Group | Target | Pred | Correct")
         for groupi, targeti, predi, correcti in zip(group, target, pred, correct):
