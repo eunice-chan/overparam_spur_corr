@@ -214,6 +214,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
                     data_time=data_time, loss=losses, top1=top1, 
                     acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
                 sys.stdout.flush()
+        print("Done for loop")
     else:
         group = []
         for idx, (images, labels) in enumerate(train_loader):
@@ -365,7 +366,7 @@ def main():
     optimizer = set_optimizer(opt, classifier) #SGD
     
     # logs
-    log_file = open(opt.log_folder+"/log.txt", "a")
+    log_file = open(opt.log_folder+"/log.csv", "a")
     header = "epoch,avg_train_acc,avg_train_count,avg_val_acc,avg_val_count"
     if opt.dataset == "waterbirds":
         header += ",avg_test_acc,avg_test_count"
@@ -385,7 +386,7 @@ def main():
                           optimizer, epoch, opt)
         time2 = time.time()
         print('Train epoch {}, total time {:.2f}, accuracy:{:.2f}'.format(
-            epoch, time2 - time1, acc))
+            epoch, time2 - time1, acc.avg))
 
         # eval for one epoch
         loss, val_acc, val_group = validate(val_loader, model, classifier, criterion, opt)
