@@ -290,9 +290,8 @@ def validate(val_loader, model, classifier, criterion, opt):
                     losses[dtype].update(loss.item(), bsz)
                     acc1 = accuracy(output, labels)
                     acc = robust_acc(output, group)
-                    print(acc)
                     for i in range(4):
-                        group[dtype][i].update(acc[i].item(), bsz)
+                        groups[dtype][i].update(acc[i].item(), bsz)
                     top1[dtype].update(acc1[0].item(), bsz)
 
                     # measure elapsed time
