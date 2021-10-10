@@ -379,7 +379,7 @@ def main():
         time2 = time.time()
         print('Train epoch {}, total time {:.2f}, accuracy: {:.2f}'.format(
             epoch, time2 - time1, acc.avg))
-        print('Group 0: {:.2f}\nGroup 1: {:.2f}\nGroup 2: {:.2f}\nGroup 3: {:.2f}\n'.format(group[0].avg, group[1].avg, group[2].avg, group[3].avg))
+        print('Group 0 (size {}): {:.2f}\nGroup 1 (size {}): {:.2f}\nGroup 2 (size {}): {:.2f}\nGroup 3 (size {}): {:.2f}\n'.format(group[0].count, group[0].avg, group[1].count, group[1].avg, group[2].count, group[2].avg, group[3].count, group[3].avg))
 
         # eval for one epoch
         time1 = time.time()

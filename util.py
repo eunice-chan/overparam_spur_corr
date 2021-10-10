@@ -68,12 +68,12 @@ def robust_acc(output, target, group):
         for i in range(4):
             this_group = group.eq(i)
             group_count = this_group.sum(0, keepdim=True).item()
+            group_acc = correct[this_group]
             # print(i, "group size", group_count)
             # print("This Group? | Group | Target | Pred | Correct")
             # for tg, groupi, targeti, predi, correcti in zip(this_group, group, target, pred, correct):
             #     print(tg.item(), "|", groupi.item(), "|", targeti.item(), "|", predi, "|", correcti.item())
-            # group_acc = correct[this_group]
-            # print(group_acc)
+            # print(group_acc, sum(group_acc))
             # print("ACC", group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count))
             res.append([group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count), group_count])
         return res
