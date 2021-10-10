@@ -290,6 +290,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                     losses[dtype].update(loss.item(), bsz)
                     acc1 = accuracy(output, labels)
                     acc = robust_acc(output, group)
+                    print(acc)
                     for i in range(4):
                         group[dtype][i].update(acc[i].item(), bsz)
                     top1[dtype].update(acc1[0].item(), bsz)
@@ -377,11 +378,17 @@ def main():
         loss, acc, group = train(train_loader, model, classifier, criterion,
                           optimizer, epoch, opt)
         time2 = time.time()
-        print('Train epoch {}, total time {:.2f}, accuracy:{:.2f}'.format(
+        print('Train epoch {}, total time {:.2f}, accuracy: {:.2f}'.format(
             epoch, time2 - time1, acc.avg))
+        print('Group 0: {:.2f}\nGroup 1: {:.2f}\nGroup 2: {:.2f}\nGroup 3: {:.2f}\n'.format(group[0].avg, group[1].avg, group[2].avg, group[3].avg))
 
         # eval for one epoch
+        time1 = time.time()
         loss, val_acc, val_group = validate(val_loader, model, classifier, criterion, opt)
+        time2 = time.time()
+        print('Test epoch {}, total time {:.2f}, accuracy: {:.2f}'.format(
+            epoch, time2 - time1, val_acc.avg))
+        print('Group 0: {:.2f}\nGroup 1: {:.2f}\nGroup 2: {:.2f}\nGroup 3: {:.2f}\n'.format(val_group[0].avg, val_group[1].avg, val_group[2].avg, val_group[3].avg))
 
         # save train, val loss, acc, group(s) to csv
         row = "{epoch},{avg_train_acc},{avg_train_count}".\
