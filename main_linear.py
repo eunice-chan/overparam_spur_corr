@@ -288,7 +288,7 @@ def validate(val_loader, model, classifier, criterion, opt):
 
                     # update metric
                     losses[dtype].update(loss.item(), bsz)
-                    acc1, acc5 = accuracy(output, labels, topk=(1, 5))
+                    acc1 = accuracy(output, labels)
                     acc = robust_acc(output, group)
                     for i in range(4):
                         group[dtype][i].update(acc[i].item(), bsz)
