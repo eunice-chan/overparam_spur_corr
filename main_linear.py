@@ -197,16 +197,6 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
 
             # print info
             if (idx + 1) % opt.print_freq == 0:
-                print('Train: [{0}][{1}/{2}]\t'.format(
-                    epoch, idx + 1, len(train_loader)))
-                print('BT {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'.format(batch_time=batch_time))
-                print('DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'.format(data_time=data_time))
-                print('loss {loss.val:.3f} ({loss.avg:.3f})\t'.format(loss=losses))
-                print(top1)
-                print(top1.val)
-                print(top1.avg)
-                print('Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'.format(top1=top1))
-                print('Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
                 print('Train: [{0}][{1}/{2}]\t'
                     'BT {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                     'DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'
@@ -217,7 +207,6 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
                     data_time=data_time, loss=losses, top1=top1, 
                     acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
                 sys.stdout.flush()
-        print("Done for loop")
     else:
         group = []
         for idx, (images, labels) in enumerate(train_loader):
@@ -288,7 +277,7 @@ def validate(val_loader, model, classifier, criterion, opt):
             end = time.time()
             for dtype, validate_loader in enumerate(val_loader):
                 batch_time = AverageMeter()
-                for idx, (images, labels) in enumerate(validate_loader):
+                for idx, (images, labels, group) in enumerate(validate_loader):
                     images = images.float().cuda()
                     labels = labels.cuda()
                     bsz = labels.shape[0]
