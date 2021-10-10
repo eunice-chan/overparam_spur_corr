@@ -212,7 +212,7 @@ def train(train_loader, model, classifier, criterion, optimizer, epoch, opt):
                     'DT {data_time.val:.3f} (Avg: {data_time.avg:.3f}, Total: {data_time.sum:.3f})\t'
                     'loss {loss.val:.3f} ({loss.avg:.3f})\t'
                     'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                    'Group Acc@1 {acc0:.3f} {acc1:.3f} {acc2:.3f} {acc3:.3f}'.format(
+                    'Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
                     epoch, idx + 1, len(train_loader), batch_time=batch_time,
                     data_time=data_time, loss=losses, top1=top1, 
                     acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
@@ -314,7 +314,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                             'Time {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                             'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                             'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                            'Group Acc@1 {acc0:.3f} {acc1:.3f} {acc2:.3f} {acc3:.3f}'.format(
+                            'Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
                             idx, len(validate_loader), batch_time=batch_time,
                             loss=losses, top1=top1,
                             acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
