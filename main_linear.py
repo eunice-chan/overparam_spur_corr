@@ -385,8 +385,8 @@ def main():
         time1 = time.time()
         loss, val_acc, val_group = validate(val_loader, model, classifier, criterion, opt)
         time2 = time.time()
-        print('Test epoch {}, total time {:.2f}, accuracy: {:.2f}'.format(
-            epoch, time2 - time1, val_acc.avg))
+        print('Test epoch {}, total time {:.2f}, val accuracy: {:.2f}, test accuracy: {:.2f}'.format(
+            epoch, time2 - time1, val_acc[0].avg, val_acc[1].avg))
         print('Val: Group 0 (size {}): {:.2f}\nGroup 1 (size {}): {:.2f}\nGroup 2 (size {}): {:.2f}\nGroup 3 (size {}): {:.2f}\n'.format(val_group[0][0].count, val_group[0][0].avg, val_group[0][1].count, val_group[0][1].avg, val_group[0][2].count, val_group[0][2].avg, val_group[0][3].count, val_group[0][3].avg))
         print('Test: Group 0 (size {}): {:.2f}\nGroup 1 (size {}): {:.2f}\nGroup 2 (size {}): {:.2f}\nGroup 3 (size {}): {:.2f}\n'.format(val_group[1][0].count, val_group[1][0].avg, val_group[1][1].count, val_group[1][1].avg, val_group[1][2].count, val_group[1][2].avg, val_group[1][3].count, val_group[1][3].avg))
 
