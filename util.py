@@ -79,7 +79,7 @@ def robust_acc(output, target, group):
                 res.append([group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count), group_count])
             else:
                 print("Group", i, "has no examples in this batch")
-                res.append([100, 0])
+                res.append([torch.Tensor([100]), 0])
         return res
 
 def adjust_learning_rate(args, optimizer, epoch):
