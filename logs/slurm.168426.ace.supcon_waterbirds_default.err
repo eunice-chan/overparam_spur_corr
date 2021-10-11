@@ -1,1 +1,0 @@
-/var/lib/slurm-llnl/slurmd/job168426/slurm_script: line 28: 73818 Segmentation fault      (core dumped) python main_supcon.py --dataset waterbirds --num_workers 30 --batch_size 128 --trial 32size

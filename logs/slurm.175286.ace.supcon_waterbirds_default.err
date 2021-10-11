@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/data/ekchan/repos/overparam_spur_corr/main_linear.py", line 427, in <module>
+    main()
+  File "/data/ekchan/repos/overparam_spur_corr/main_linear.py", line 414, in main
+    save_model(model, optimizer, opt, epoch, save_file)
+NameError: name 'save_model' is not defined
