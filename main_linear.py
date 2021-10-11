@@ -304,7 +304,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                             'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                             'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                             'Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
-                            idx, len(validate_loader), batch_time=batch_time,
+                            dtype, len(val_loader), batch_time=batch_time,
                             loss=losses[dtype], top1=top1[dtype],
                             acc0=groups[dtype][0], acc1=groups[dtype][1], acc2=groups[dtype][2], acc3=groups[dtype][3]))
  
@@ -367,6 +367,7 @@ def main():
                 header += ",avg_{dtype}_acc:group_{group},avg_{dtype}count:group_{group}".\
                             format(dtype=dtype, group=group)
     log_file.write(header+"\n")
+    log_file.close()
 
     # training routine
     for epoch in range(1, opt.epochs + 1):
@@ -391,6 +392,7 @@ def main():
         print('Test: Group 0 (size {}): {:.2f}\nGroup 1 (size {}): {:.2f}\nGroup 2 (size {}): {:.2f}\nGroup 3 (size {}): {:.2f}\n'.format(val_group[1][0].count, val_group[1][0].avg, val_group[1][1].count, val_group[1][1].avg, val_group[1][2].count, val_group[1][2].avg, val_group[1][3].count, val_group[1][3].avg))
 
         # save train, val loss, acc, group(s) to csv
+        log_file = open(opt.log_folder+"/log.csv", "a")
         row = "{epoch},{avg_train_acc},{avg_train_count}".\
                 format(epoch=epoch, avg_train_acc=acc.avg, avg_train_count=acc.count)
         for acc in val_acc:
@@ -401,6 +403,7 @@ def main():
                 row += ',{},{}'.format(dtype[i].avg, dtype[i].count)
         
         log_file.write(row+"\n")
+        log_file.close()
    
         if val_acc[1].avg > best_acc:
             best_acc = val_acc[1].avg
