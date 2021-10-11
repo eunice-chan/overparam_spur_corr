@@ -308,7 +308,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                             loss=losses[dtype], top1=top1[dtype],
                             acc0=groups[dtype][0], acc1=groups[dtype][1], acc2=groups[dtype][2], acc3=groups[dtype][3]))
  
-                    print(' * Acc@1 val {topv1.avg:.3f}, test {topt1.avg:.3f}'.format(topv1=top1[0], topt1=top1[1]))
+            print(' * Acc@1 val {topv1.avg:.3f}, test {topt1.avg:.3f}'.format(topv1=top1[0], topt1=top1[1]))
     else:
         batch_time = AverageMeter()
         groups = [[]]
@@ -364,7 +364,7 @@ def main():
         header += ",avg_test_acc,avg_test_count"
         for group in range(4):
             for dtype in ["train", "val", "test"]:
-                header += ",avg_{dtype}_acc:group_{group},avg_{dtype}count:group_{group}".\
+                header += ",avg_{dtype}_acc:group_{group},avg_{dtype}_count:group_{group}".\
                             format(dtype=dtype, group=group)
     log_file.write(header+"\n")
     log_file.close()
