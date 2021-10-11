@@ -403,7 +403,7 @@ def main():
         log_file.write(row+"\n")
    
         if val_acc[1].avg > best_acc:
-            best_acc = val_acc
+            best_acc = val_acc[1].avg
 
         if epoch % opt.save_freq == 0:
             save_file = os.path.join(
