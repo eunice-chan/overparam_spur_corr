@@ -303,12 +303,10 @@ def validate(val_loader, model, classifier, criterion, opt):
                             'Time {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                             'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                             'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                            'Group Acc@1 - Val {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}\t'
-                            'Group Acc@1 - Test {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
-                            idx, len(validate_loader), batch_time=batch_time,
-                            loss=losses, top1=top1,
-                            accv0=groups[0][0], accv1=groups[0][1], accv2=groups[0][2], accv3=groups[0][3],
-                            acct0=groups[1][0], acct1=groups[1][1], acct2=groups[1][2], acct3=groups[1][3]))
+                            'Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
+                            idx, len(validate_loader), batch_time=batch_time[idx],
+                            loss=losses[idx], top1=top1[idx],
+                            acct0=groups[idx][0], acct1=groups[idx][1], acct2=groups[idx][2], acct3=groups[idx][3]))
  
                     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
     else:
