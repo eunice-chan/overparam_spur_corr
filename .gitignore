@@ -1,4 +1,5 @@
 __pycache__/
 datasets/
 .ipynb_checkpoints/
-save
+save/SupCon
+save/SupConLinear/waterbirds_models
