@@ -303,10 +303,12 @@ def validate(val_loader, model, classifier, criterion, opt):
                             'Time {batch_time.val:.3f} (Avg: {batch_time.avg:.3f}, Total: {batch_time.sum:.3f})\t'
                             'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                             'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                            'Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
+                            'Group Acc@1 - Val {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}\t'
+                            'Group Acc@1 - Test {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
                             idx, len(validate_loader), batch_time=batch_time,
                             loss=losses, top1=top1,
-                            acc0=groups[0], acc1=groups[1], acc2=groups[2], acc3=groups[3]))
+                            accv0=groups[0][0], accv1=groups[0][1], accv2=groups[0][2], accv3=groups[0][3],
+                            acct0=groups[1][0], acct1=groups[1][1], acct2=groups[1][2], acct3=groups[1][3]))
  
                     print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
     else:
@@ -387,7 +389,8 @@ def main():
         time2 = time.time()
         print('Test epoch {}, total time {:.2f}, accuracy: {:.2f}'.format(
             epoch, time2 - time1, val_acc.avg))
-        print('Group 0: {:.2f}\nGroup 1: {:.2f}\nGroup 2: {:.2f}\nGroup 3: {:.2f}\n'.format(val_group[0].avg, val_group[1].avg, val_group[2].avg, val_group[3].avg))
+        print('Val: Group 0 (size {}): {:.2f}\nGroup 1 (size {}): {:.2f}\nGroup 2 (size {}): {:.2f}\nGroup 3 (size {}): {:.2f}\n'.format(val_group[0][0].count, val_group[0][0].avg, val_group[0][1].count, val_group[0][1].avg, val_group[0][2].count, val_group[0][2].avg, val_group[0][3].count, val_group[0][3].avg))
+        print('Test: Group 0 (size {}): {:.2f}\nGroup 1 (size {}): {:.2f}\nGroup 2 (size {}): {:.2f}\nGroup 3 (size {}): {:.2f}\n'.format(val_group[1][0].count, val_group[1][0].avg, val_group[1][1].count, val_group[1][1].avg, val_group[1][2].count, val_group[1][2].avg, val_group[1][3].count, val_group[1][3].avg))
 
         # save train, val loss, acc, group(s) to csv
         row = "{epoch},{avg_train_acc},{avg_train_count}".\
