@@ -58,7 +58,7 @@ def robust_acc(output, target, group):
         pred = pred.t()
         correct = pred.eq(target.view(1, -1).expand_as(pred))[:1].view(-1)
 
-        pred=pred.cpu().numpy()[0]
+        # pred=pred.cpu().numpy()[0]
         # print("Batch size", batch_size)
         # print("Group | Target | Pred | Correct")
         # for groupi, targeti, predi, correcti in zip(group, target, pred, correct):
@@ -69,15 +69,16 @@ def robust_acc(output, target, group):
             this_group = group.eq(i)
             group_count = this_group.sum(0, keepdim=True).item()
             group_acc = correct[this_group]
-            print(i, "group size", group_count)
-            print("This Group? | Group | Target | Pred | Correct")
-            for tg, groupi, targeti, predi, correcti in zip(this_group, group, target, pred, correct):
-                print(tg.item(), "|", groupi.item(), "|", targeti.item(), "|", predi, "|", correcti.item())
-            print(group_acc, sum(group_acc))
-            print("ACC", group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count))
+            # print(i, "group size", group_count)
+            # print("This Group? | Group | Target | Pred | Correct")
+            # for tg, groupi, targeti, predi, correcti in zip(this_group, group, target, pred, correct):
+            #     print(tg.item(), "|", groupi.item(), "|", targeti.item(), "|", predi, "|", correcti.item())
+            # print(group_acc, sum(group_acc))
             if group_count:
+                 # print("ACC", group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count))
                 res.append([group_acc.float().sum(0, keepdim=True).mul_(100.0 / group_count), group_count])
             else:
+                print("Group", i, "has no examples in this batch")
                 res.append([100, 0])
         return res
 
