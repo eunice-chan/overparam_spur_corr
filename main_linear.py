@@ -308,7 +308,7 @@ def validate(val_loader, model, classifier, criterion, opt):
                             loss=losses[idx], top1=top1[idx],
                             acc0=groups[idx][0], acc1=groups[idx][1], acc2=groups[idx][2], acc3=groups[idx][3]))
  
-                    print(' * Acc@1 {top1.avg:.3f}'.format(top1=top1))
+                    print(' * Acc@1 val {topv1.avg:.3f}, test {topt1.avg:.3f}'.format(topv1=top1[0], topt1=top1[1]))
     else:
         batch_time = AverageMeter()
         groups = [[]]
