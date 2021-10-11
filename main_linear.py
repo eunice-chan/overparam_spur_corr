@@ -305,8 +305,8 @@ def validate(val_loader, model, classifier, criterion, opt):
                             'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                             'Group Acc@1 {acc0.avg:.3f} {acc1.avg:.3f} {acc2.avg:.3f} {acc3.avg:.3f}'.format(
                             idx, len(validate_loader), batch_time=batch_time,
-                            loss=losses[idx], top1=top1[idx],
-                            acc0=groups[idx][0], acc1=groups[idx][1], acc2=groups[idx][2], acc3=groups[idx][3]))
+                            loss=losses[dtype], top1=top1[dtype],
+                            acc0=groups[dtype][0], acc1=groups[dtype][1], acc2=groups[dtype][2], acc3=groups[dtype][3]))
  
                     print(' * Acc@1 val {topv1.avg:.3f}, test {topt1.avg:.3f}'.format(topv1=top1[0], topt1=top1[1]))
     else:
